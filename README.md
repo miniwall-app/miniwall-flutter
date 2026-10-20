@@ -54,3 +54,11 @@ native side stops the auto placements and frees every screen waiting on Dart.
 - `onAnswer(fieldId, value, answers)`, `onOpenUrl(url)`: notifications; the screen does not wait for them.
 - `onError(String message)`: failures the screen reports (load failure, a handler that threw, an unusable link). Dart receives the
   reason as a plain `String`, not an exception.
+
+## Develop
+
+```bash
+flutter pub get && flutter analyze && flutter test
+```
+
+`example/` is a sample app (see `example/README.md`). It bundles the Miniwall spec's templates (`scripts/fetch-spec.sh` fetches the spec pinned in `SPEC_VERSION` into `.spec/`; `example/tool/sync_templates.sh` copies them in) and builds against `miniwall-ios` and `miniwall-android` checked out next to this repository.

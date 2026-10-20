@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Debug builds only: integration_test talks to a local http server on the device (loopback). -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>
