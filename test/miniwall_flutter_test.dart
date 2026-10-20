@@ -1,5 +1,5 @@
 // Unit tests of lib/miniwall_flutter.dart with the `miniwall` MethodChannel mocked (no native code, no device):
-//   cd sdks/flutter && flutter test
+//   flutter test
 // `onNative` plays the native side: it sees every call Dart makes, and `fromNative` sends Dart the requests the native SDK
 // would (purchase, restore, action, ...), returning what Dart answered.
 import 'dart:async';

@@ -5,10 +5,10 @@ Android SDKs. Flutter 3.22+, iOS 16+, Android minSdk 24. Status: preview (not on
 
 ## Install (local, before publishing)
 
-1. `pubspec.yaml`: `miniwall_flutter: { path: <repo>/sdks/flutter }`
-2. iOS `ios/Podfile`: `pod 'MiniwallCore', :path => '<repo>/sdks/ios'` and `pod 'MiniwallSDK', :path => '<repo>/sdks/ios'`; platform `ios, '16.0'`. The plugin pod depends on `MiniwallSDK ~> 0.1`; until that pod is published, the two `:path` lines are required.
+1. `pubspec.yaml`: `miniwall_flutter: { path: <path to this checkout> }`
+2. iOS `ios/Podfile`: `pod 'MiniwallCore', :path => '<miniwall-ios checkout>'` and `pod 'MiniwallSDK', :path => '<miniwall-ios checkout>'`; platform `ios, '16.0'`. The plugin pod depends on `MiniwallSDK ~> 0.1`; until that pod is published, the two `:path` lines are required.
 3. Android: your `MainActivity` must extend `FlutterFragmentActivity` (a `ComponentActivity`), not `FlutterActivity`; otherwise banners and toasts open as a sheet and a toast never closes by itself.
-4. Android `android/settings.gradle` (Kotlin DSL: `settings.gradle.kts`, see `sdks/README.md`): `includeBuild('<repo>/sdks/android') { dependencySubstitution { substitute(module('app.miniwall:sdk')).using(project(':sdk')) } }`.
+4. Android `android/settings.gradle` (Kotlin DSL: `settings.gradle.kts`): `includeBuild('<miniwall-android checkout>') { dependencySubstitution { substitute(module('app.miniwall:sdk')).using(project(':sdk')) } }`.
 
 ## Use
 
