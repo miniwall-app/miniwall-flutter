@@ -1,0 +1,75 @@
+name: Release
+
+# Publishes miniwall_flutter to pub.dev with automated publishing (OIDC, no token) when a version tag is pushed.
+# pub.dev only allows this for a package that already exists, so the FIRST version is published by hand
+# (`flutter pub publish` on the owner's machine), then the owner enables "Automated publishing" for this repository on pub.dev
+# with the tag pattern `{{version}}`. Needs the iOS pod and the Android artifact of the same version first (guard checks both).
+# Nothing is published until the owner creates the `publish` environment with required reviewers and sets PUBLISH_ENABLED=true.
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    name: tag checks
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.g.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: g
+        env:
+          TAG: ${{ github.ref_name }}
+          ENABLED: ${{ vars.PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::tag $TAG is not on main"; exit 1; }
+          v=$(sed -n 's/^version: *//p' pubspec.yaml)
+          [ "$v" = "$TAG" ] || { echo "::error::tag $TAG does not match pubspec.yaml ($v)"; exit 1; }
+          a=$(sed -n "s/^version '\(.*\)'/\1/p" android/build.gradle)
+          [ "$a" = "$TAG" ] || { echo "::error::tag $TAG does not match android/build.gradle ($a)"; exit 1; }
+          grep -qE "^## ${TAG//./\\.}( |$)" CHANGELOG.md || { echo "::error::CHANGELOG.md has no '## $TAG' section"; exit 1; }
+          android=$(sed -n "s/.*'app.miniwall:sdk:\([^']*\)'.*/\1/p" android/build.gradle)
+          curl -fsSI "https://repo1.maven.org/maven2/app/miniwall/sdk/$android/sdk-$android.pom" >/dev/null || { echo "::error::app.miniwall:sdk:$android is not on Maven Central yet"; exit 1; }
+          curl -fsS https://trunk.cocoapods.org/api/v1/pods/MiniwallSDK | grep -q '"name":"0\.' || { echo "::error::MiniwallSDK is not on CocoaPods yet"; exit 1; }
+          echo "enabled=${ENABLED:-false}" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: analyze and test
+    needs: guard
+    if: needs.guard.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get && flutter analyze && flutter test
+
+  publish:
+    name: publish to pub.dev
+    needs: test
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      environment: publish
+
+  github-release:
+    name: GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" --verify-tag --title "$TAG" --generate-notes
