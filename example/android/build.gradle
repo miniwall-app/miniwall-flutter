@@ -1,5 +1,6 @@
 allprojects {
     repositories {
+        mavenLocal() // app.miniwall:sdk until it is on Maven Central: ./gradlew publishToMavenLocal in miniwall-android
         google()
         mavenCentral()
     }

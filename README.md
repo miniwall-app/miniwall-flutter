@@ -1,14 +1,14 @@
 # miniwall_flutter
 
 Miniwall for Flutter: screens built in the Miniwall dashboard, rendered natively by the iOS and
-Android SDKs. Flutter 3.22+, iOS 16+, Android minSdk 24. Status: preview (not on pub.dev yet). Tested on an Android emulator (integration 7/7, 77 templates); not yet run on iOS.
+Android SDKs. Flutter 3.22+, iOS 16+, Android minSdk 24. Status: preview (not on pub.dev yet). Tested on an Android 15 emulator and an iOS 27 simulator: `flutter analyze`, 19 unit tests, 7 integration tests on both, and the 77-template sweep in light mode, dark mode and at the largest text size on both.
 
 ## Install (local, before publishing)
 
 1. `pubspec.yaml`: `miniwall_flutter: { path: <path to this checkout> }`
 2. iOS `ios/Podfile`: `pod 'MiniwallCore', :path => '<miniwall-ios checkout>'` and `pod 'MiniwallSDK', :path => '<miniwall-ios checkout>'`; platform `ios, '16.0'`. The plugin pod depends on `MiniwallSDK ~> 0.1`; until that pod is published, the two `:path` lines are required.
 3. Android: your `MainActivity` must extend `FlutterFragmentActivity` (a `ComponentActivity`), not `FlutterActivity`; otherwise banners and toasts open as a sheet and a toast never closes by itself.
-4. Android `android/settings.gradle` (Kotlin DSL: `settings.gradle.kts`): `includeBuild('<miniwall-android checkout>') { dependencySubstitution { substitute(module('app.miniwall:sdk')).using(project(':sdk')) } }`.
+4. Android: until `app.miniwall:sdk` is on Maven Central, publish it once to your machine (`cd <miniwall-android checkout> && ./gradlew publishToMavenLocal`) and add `mavenLocal()` to the app's `allprojects { repositories { ... } }` (`android/build.gradle`). Do not use `includeBuild` with a current Flutter: the native SDK builds with AGP 8.7.3, Flutter 3.47 apps need AGP 8.11+, and Gradle refuses two AGP versions in one build. The published AAR works in apps on newer AGP and Kotlin.
 
 ## Use
 

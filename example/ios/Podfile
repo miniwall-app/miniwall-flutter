@@ -31,8 +31,8 @@ target 'Runner' do
   use_modular_headers!
 
   # The native SDK from this repo, until it is on CocoaPods.
-  pod 'MiniwallCore', :path => '../../../../miniwall-ios'
-  pod 'MiniwallSDK', :path => '../../../../miniwall-ios'
+  pod 'MiniwallCore', :path => '../../../miniwall-ios'
+  pod 'MiniwallSDK', :path => '../../../miniwall-ios'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
