@@ -9,7 +9,17 @@ buildscript {
     }
 }
 
-rootProject.allprojects { repositories { google(); mavenCentral() } }
+// app.miniwall:sdk is served from the Miniwall Maven repository; declaring it here means an app that adds this plugin needs no extra setup.
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://maven.miniwall.app'
+            content { includeGroup 'app.miniwall' }
+        }
+    }
+}
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -26,7 +36,7 @@ android {
 }
 
 dependencies {
-    // The native SDK. Until it is on Maven Central, include miniwall-android in the app's
+    // The native SDK, from https://maven.miniwall.app. To work on it locally, include miniwall-android in the app's
     // android/settings.gradle (see README) and this resolves to the local project.
     implementation 'app.miniwall:sdk:0.1.0'
 }
